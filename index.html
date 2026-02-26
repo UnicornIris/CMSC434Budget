@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Tab Project</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div id="Text" class="tabcontent">
+  <h1>Text</h1>
+  <p>London is the capital city of England.</p>
+</div>
+
+<div id="LR" class="tabcontent">
+  <h1>LR</h1>
+  <p>Paris is the capital of France.</p>
+</div>
+
+<div id="Colors" class="tabcontent">
+  <h1>Colors</h1>
+</div>
+
+<div id="Profile" class="tabcontent">
+  <h1>Profile</h1>
+  <div class="profile-info">
+    <img src="images/profile.png" class="profile-image" onclick="showWarning()">
+    <p class="user-id">User ID</p>
+  </div>
+  <div id="profileWarning" class="warning-bar">
+    <span>Hello! Do not click on the profile image.</span>
+    <button class="close-btn" onclick="closeWarning()">×</button>
+  </div>
+  </div>
+</div>
+
+<div id="Choices" class="tabcontent">
+  <h1>Choices</h1>
+  <p>Oslo is the capital of Norway.</p>
+</div>
+
+<div id="ToDo" class="tabcontent">
+  <h1>ToDo</h1>
+  <p>Oslo is the capital of Norway.</p>
+</div>
+
+<button class="tablink" onclick="openTab('Text', this, 'red')" id="defaultOpen">Text</button>
+<button class="tablink" onclick="openTab('LR', this, 'green')">LR</button>
+<button class="tablink" onclick="openTab('Colors', this, 'blue')">Colors</button>
+<button class="tablink" onclick="openTab('Profile', this, 'orange')">
+    <img src="images/profile.png" class="tab-icon">
+    Profile
+</button>
+<button class="tablink" onclick="openTab('Choices', this, 'yellow')">Choices</button>
+<button class="tablink" onclick="openTab('ToDo', this, 'purple')">Todo</button>
+
+<script src="js/app.js"></script>
+</body>
+</html>

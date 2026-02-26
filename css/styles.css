@@ -1,0 +1,99 @@
+/* Style the tab buttons */
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: Arial;
+}
+
+.tablink {
+  background-color: #555;
+  color: white;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  font-size: 17px;
+  width: 16.6%;
+}
+
+/* Change background color of buttons on hover */
+.tablink:hover {
+  background-color: #777;
+}
+
+/* Set default styles for tab content */
+.tabcontent {
+  display: none;
+  height: calc(100vh - 48px);
+  padding: 50px;
+  box-sizing: border-box;
+  color: white;
+  text-align: center;
+}
+
+.tab-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+/* Style each tab content individually */
+#Text {background-color:red;}
+#LR {background-color:green;}
+#Colors {background-color:blue;}
+#Profile {background-color:orange;}
+#Choices {background-color:lightblue;}
+#ToDo {background-color:purple;}
+
+
+/* Profile tab layout */
+.profile-tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Center content */
+.profile-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Profile image */
+.profile-image {
+  width: 160px;
+  height: 160px;
+  cursor: pointer;
+}
+
+/* Warning bar */
+.warning-bar {
+  position: relative;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #f44336;
+  color: white;
+  padding: 16px 48px 16px 20px;
+  font-size: 20px;
+  display: none;
+  box-sizing: border-box;
+}
+
+/* Close button */
+.close-btn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: white;
+  font-size: 26px;
+  cursor: pointer;
+}
