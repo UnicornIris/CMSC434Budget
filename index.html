@@ -28,12 +28,35 @@
     </div>
 
     <div id="LR" class="tabcontent">
-      <h1>LR</h1>
-      <p>Paris is the capital of France.</p>
+      <h1>-Text in Lower Right-</h1>
+      <span class="lr-text">Down Here</span>
     </div>
 
     <div id="Colors" class="tabcontent">
-      <h1>Colors</h1>
+      <h1>-Colors Example-</h1>
+      <div class="color-line color-line-1">Hello There</div>
+      <div class="color-line color-line-2">Hi Again</div>
+      <div class="pie-container">
+        <svg viewBox="0 0 340 380" width="100%" class="pie-chart">
+          <!-- Roses slice: 300/900 = 120° -->
+          <path d="M170,180 L170,50 A130,130 0 0,1 282.6,245 Z" fill="#E8556D" stroke="white" stroke-width="2"/>
+          <!-- Violets slice: 500/900 ≈ 200° -->
+          <path d="M170,180 L282.6,245 A130,130 0 1,1 86.4,80.4 Z" fill="#DDA0DD" stroke="white" stroke-width="2"/>
+          <!-- Tulips slice: 100/900 ≈ 40° -->
+          <path d="M170,180 L86.4,80.4 A130,130 0 0,1 170,50 Z" fill="#F0E68C" stroke="white" stroke-width="2"/>
+          <!-- Value labels -->
+          <text x="120" y="42" font-size="18" font-weight="bold" fill="#000">100</text>
+          <text x="290" y="195" font-size="18" font-weight="bold" fill="#000">300</text>
+          <text x="50" y="295" font-size="18" font-weight="bold" fill="#000">500</text>
+          <!-- Legend -->
+          <rect x="30" y="340" width="20" height="20" fill="#E8556D"/>
+          <text x="55" y="356" font-size="16" font-weight="bold" fill="#000">Roses</text>
+          <rect x="120" y="340" width="20" height="20" fill="#DDA0DD"/>
+          <text x="145" y="356" font-size="16" font-weight="bold" fill="#000">Violets</text>
+          <rect x="220" y="340" width="20" height="20" fill="#F0E68C"/>
+          <text x="245" y="356" font-size="16" font-weight="bold" fill="#000">Tulips</text>
+        </svg>
+      </div>
     </div>
 
     <div id="Profile" class="tabcontent">
@@ -49,13 +72,36 @@
     </div>
 
     <div id="Choices" class="tabcontent">
-      <h1>Choices</h1>
-      <p>Oslo is the capital of Norway.</p>
+      <h1>-Choices Screen-</h1>
+
+      <div class="choices-form">
+        <label class="choices-label">Camera Type #1:</label>
+        <div class="radio-group">
+          <label><input type="radio" name="cameraType1" value="dSLR" checked> dSLR</label>
+          <label><input type="radio" name="cameraType1" value="Mirrorless"> Mirrorless</label>
+        </div>
+
+        <label class="choices-label">Camera Type #2:</label>
+        <select id="cameraType2">
+          <option value="dSLR">dSLR</option>
+          <option value="Mirrorless">Mirrorless</option>
+          <option value="Point and Shoot">Point and Shoot</option>
+          <option value="Film">Film</option>
+        </select>
+
+        <button class="choices-btn" onclick="printChoices()">Print something based on above choices...</button>
+
+        <p id="choicesOutput"></p>
+      </div>
     </div>
 
     <div id="ToDo" class="tabcontent">
-      <h1>ToDo</h1>
-      <p>Oslo is the capital of Norway.</p>
+      <h1>-To Do List-</h1>
+      <div class="todo-input-row">
+        <input type="text" id="todoInput" placeholder="New entry...">
+        <button onclick="addTodo()">Add</button>
+      </div>
+      <ul id="todoList"></ul>
     </div>
 
   </div>
