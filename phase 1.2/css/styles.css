@@ -1,0 +1,330 @@
+/*Source tabholder https://www.w3schools.com/howto/howto_js_tab_header.asp*/
+/* ========== Page & App Shell ========== */
+
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #444;
+}
+
+#app {
+  width: 640px;
+  height: 960px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  background-color: #FFB6C1;
+}
+
+#content {
+  height: 895px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ========== Tab Content (shared defaults) ========== */
+
+.tabcontent {
+  display: none;
+  height: 100%;
+  padding: 10px 15px;
+  box-sizing: border-box;
+  background-color: #FFB6C1;
+  color: #000;
+  overflow-y: auto;
+}
+
+.tabcontent h1 {
+  font-style: italic;
+  margin: 5px 0 10px 0;
+}
+/*source https://www.w3schools.com/css/css_overflow.asp */
+/* ========== Tab 1: Text ========== */
+
+#Text {
+  text-align: left;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+#Text h1 {
+  flex-shrink: 0;
+}
+
+.text-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* ========== Tab-specific backgrounds (override if needed) ========== */
+
+/* ========== Tab 2: LR ========== */
+/* Source: W3Schools CSS Position Property
+     https://www.w3schools.com/css/css_positioning.asp */
+#LR {
+  background-color: #FFB6C1;
+  position: relative;
+}
+
+.lr-text {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  font-size: 14px;
+}
+
+/* ========== Tab 3: Colors ========== */
+
+#Colors {
+  background-color: #FFB6C1;
+  text-align: center;
+}
+
+.color-line {
+  width: 100%;
+  padding: 8px 0;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.color-line-1 {
+  background-color: #000;
+  color: #FFD700;
+}
+
+.color-line-2 {
+  background-color: #FFD700;
+  color: #800080;
+}
+
+.pie-container {
+  max-width: 480px;
+  margin: 10px auto 0;
+}
+
+.pie-chart {
+  display: block;
+}
+#Profile { background-color: #FFB6C1; }
+/* ========== Tab 5: Choices ========== */
+
+#Choices {
+  background-color: #FFB6C1;
+  text-align: left;
+}
+
+.choices-form {
+  padding: 5px 0;
+}
+
+.choices-label {
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
+
+.radio-group label {
+  display: block;
+  font-size: 16px;
+  margin: 4px 0;
+  cursor: pointer;
+}
+
+.radio-group input[type="radio"] {
+  margin-right: 6px;
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+#cameraType2 {
+  font-size: 16px;
+  padding: 6px 10px;
+  margin-top: 4px;
+}
+
+.choices-btn {
+  display: block;
+  margin: 25px auto;
+  padding: 12px 20px;
+  font-size: 14px;
+  background-color: #e0e0e0;
+  border: 2px solid #999;
+  cursor: pointer;
+}
+
+.choices-btn:hover {
+  background-color: #d0d0d0;
+}
+
+#choicesOutput {
+  font-size: 16px;
+  margin-top: 10px;
+  font-weight: bold;
+}
+/* ========== Tab 6: ToDo ========== */
+/* Source: https://www.w3schools.com/howto/howto_js_todolist.asp  */
+#ToDo {
+  background-color: #FFB6C1;
+  text-align: left;
+}
+
+.todo-input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.todo-input-row input {
+  flex: 1;
+  font-size: 16px;
+  padding: 8px 10px;
+  border: 2px solid #999;
+}
+
+.todo-input-row button {
+  font-size: 16px;
+  padding: 8px 16px;
+  cursor: pointer;
+  border: 2px solid #999;
+  background-color: #e0e0e0;
+}
+
+.todo-input-row button:hover {
+  background-color: #d0d0d0;
+}
+
+#todoList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#todoList li {
+  display: flex;
+  align-items: center;
+  padding: 12px 10px;
+  font-size: 16px;
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+  background-color: #d3d3d3;
+  cursor: pointer;
+}
+
+#todoList li.checked {
+  background-color: #fff;
+  color: #888;
+  text-decoration: line-through;
+}
+
+#todoList li .todo-text {
+  flex: 1;
+}
+
+#todoList li .delete-btn {
+  font-size: 18px;
+  color: #666;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 4px;
+  margin-left: 10px;
+}
+
+#todoList li .delete-btn:hover {
+  color: #c00;
+}
+
+#todoList li .check-mark {
+  margin-right: 8px;
+  font-size: 16px;
+  color: #555;
+}
+
+/* ========== Bottom Navigation Bar ========== */
+
+#navbar {
+  height: 65px;
+  display: flex;
+  background-color: #000044;
+  border-top: 2px solid #000033;
+}
+
+.tablink {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background-color: #000044;
+  color: #FFD700;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 4px 0;
+}
+
+.tablink svg {
+  color: #FFD700;
+}
+
+.tablink.active {
+  background-color: #1a1a5e;
+}
+
+.tablink:hover {
+  background-color: #1a1a5e;
+}
+
+/* ========== Profile tab ========== */
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.profile-image {
+  width: 160px;
+  height: 160px;
+  cursor: pointer;
+}
+
+.user-id {
+  margin-top: 8px;
+  font-size: 20px;
+  font-family: "Times New Roman", serif;
+  font-weight: bold;
+}
+
+.warning-bar {
+  position: relative;
+  background-color: #f44336;
+  color: white;
+  padding: 14px 48px 14px 20px;
+  font-size: 18px;
+  display: none;
+  display: none;
+  box-sizing: border-box;
+}
+
+.close-btn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: white;
+  font-size: 26px;
+  cursor: pointer;
+}

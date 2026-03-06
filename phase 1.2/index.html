@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Tab Project</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- tab holder /*Source https://www.w3schools.com/howto/howto_js_tab_header.asp*/ -->
+<div id="app">
+  <!-- Tab Content Area -->
+  <div id="content">
+
+    <div id="Text" class="tabcontent">
+      <!-- Source: W3Schools CSS Overflow & Scroll
+     https://www.w3schools.com/css/css_overflow.asp -->
+      <h1>-Text Screen-</h1>
+      <div class="text-scroll">
+        <p>Please note that this font size is too small to read easily on this device for many users. Consider using a larger font size for better readability on mobile screens. Accessibility guidelines recommend a minimum font size of 16px for body text on mobile devices to ensure comfortable reading without zooming.</p>
+        <p>Please note that this font size is too small to read easily on this device for many users. Consider using a larger font size for better readability on mobile screens. Accessibility guidelines recommend a minimum font size of 16px for body text on mobile devices to ensure comfortable reading without zooming.</p>
+        <p>Please note that this font size is too small to read easily on this device for many users. Consider using a larger font size for better readability on mobile screens. Accessibility guidelines recommend a minimum font size of 16px for body text on mobile devices to ensure comfortable reading without zooming.</p>
+        <p>Please note that this font size is too small to read easily on this device for many users. Consider using a larger font size for better readability on mobile screens. Accessibility guidelines recommend a minimum font size of 16px for body text on mobile devices to ensure comfortable reading without zooming.</p>
+        <p>Please note that this font size is too small to read easily on this device for many users. Consider using a larger font size for better readability on mobile screens. Accessibility guidelines recommend a minimum font size of 16px for body text on mobile devices to ensure comfortable reading without zooming.</p>
+        <p>Please note that this font size is too small to read easily on this device for many users. Consider using a larger font size for better readability on mobile screens. Accessibility guidelines recommend a minimum font size of 16px for body text on mobile devices to ensure comfortable reading without zooming.</p>
+        <p>Please note that this font size is too small to read easily on this device for many users. Consider using a larger font size for better readability on mobile screens. Accessibility guidelines recommend a minimum font size of 16px for body text on mobile devices to ensure comfortable reading without zooming.</p>
+        <p>Please note that this font size is too small to read easily on this device for many users. Consider using a larger font size for better readability on mobile screens. Accessibility guidelines recommend a minimum font size of 16px for body text on mobile devices to ensure comfortable reading without zooming.</p>
+        <p>Please note that this font size is too small to read easily on this device for many users. Consider using a larger font size for better readability on mobile screens. Accessibility guidelines recommend a minimum font size of 16px for body text on mobile devices to ensure comfortable reading without zooming.</p>
+        <p>Please note that this font size is too small to read easily on this device for many users. Consider using a larger font size for better readability on mobile screens. Accessibility guidelines recommend a minimum font size of 16px for body text on mobile devices to ensure comfortable reading without zooming.</p>
+      </div>
+    </div>
+
+    <div id="LR" class="tabcontent">
+      <h1>-Text in Lower Right-</h1>
+      <span class="lr-text">Down Here</span>
+    </div>
+
+    <div id="Colors" class="tabcontent">
+      <h1>-Colors Example-</h1>
+      <div class="color-line color-line-1">Hello There</div>
+      <div class="color-line color-line-2">Hi Again</div>
+
+      <div class="pie-container">
+        <canvas id="colorsChart" width="300" height="300"></canvas>
+      </div>
+    </div>
+
+    <div id="Profile" class="tabcontent">
+      <h1>-User Profile-</h1>
+      <div class="profile-info">
+        <img src="images/SmileyFace.png" class="profile-image" onclick="showWarning()">
+        <p class="user-id">Smiley J. Smile</p>
+      </div>
+      <div id="profileWarning" class="warning-bar">
+        <span><strong>Warning!</strong> Do not click on the profile images.</span>
+        <button class="close-btn" onclick="closeWarning()">×</button>
+      </div>
+    </div>
+
+    <div id="Choices" class="tabcontent">
+      <h1>-Choices Screen-</h1>
+
+      <div class="choices-form">
+        <label class="choices-label">Camera Type #1:</label>
+        <div class="radio-group">
+          <label><input type="radio" name="cameraType1" value="dSLR" checked> dSLR</label>
+          <label><input type="radio" name="cameraType1" value="Mirrorless"> Mirrorless</label>
+        </div>
+
+        <label class="choices-label">Camera Type #2:</label>
+        <select id="cameraType2">
+          <option value="dSLR">dSLR</option>
+          <option value="Mirrorless">Mirrorless</option>
+          <option value="Point and Shoot">Point and Shoot</option>
+          <option value="Film">Film</option>
+        </select>
+
+        <button class="choices-btn" onclick="printChoices()">Print something based on above choices...</button>
+
+        <p id="choicesOutput"></p>
+      </div>
+    </div>
+<!-- Source: https://www.w3schools.com/howto/howto_js_todolist.asp -->
+    <div id="ToDo" class="tabcontent">
+      <h1>-To Do List-</h1>
+      <div class="todo-input-row">
+        <input type="text" id="todoInput" placeholder="New entry...">
+        <button onclick="addTodo()">Add</button>
+      </div>
+      <ul id="todoList"></ul>
+    </div>
+
+  </div>
+
+
+  <!-- Bottom Navigation Bar -->
+  <div id="navbar">
+    <button class="tablink active" onclick="openTab('Text', this)" id="defaultOpen">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8">
+        <rect x="4" y="2" width="16" height="20" rx="2"/>
+        <line x1="8" y1="7" x2="16" y2="7"/>
+        <line x1="8" y1="11" x2="16" y2="11"/>
+        <line x1="8" y1="15" x2="13" y2="15"/>
+      </svg>
+      <span>Text</span>
+    </button>
+
+    <button class="tablink" onclick="openTab('LR', this)">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M5 5c0 0 0 10 10 10"/>
+        <polyline points="11,11 15,15 11,19"/>
+      </svg>
+      <span>LR</span>
+    </button>
+
+    <button class="tablink" onclick="openTab('Colors', this)">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.3-.5-.8-.5-1.2 0-1.1.9-2 2-2h2.4c3 0 5.6-2.5 5.6-5.6C23 6.4 18 2 12 2z"/>
+        <circle cx="8" cy="10" r="1.5" fill="currentColor"/>
+        <circle cx="12" cy="7" r="1.5" fill="currentColor"/>
+        <circle cx="16" cy="10" r="1.5" fill="currentColor"/>
+      </svg>
+      <span>Colors</span>
+    </button>
+
+    <button class="tablink" onclick="openTab('Profile', this)">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="12" r="10"/>
+        <circle cx="12" cy="9" r="3"/>
+        <path d="M5.5 19.5C6.5 16 9 14 12 14s5.5 2 6.5 5.5"/>
+      </svg>
+      <span>Profile</span>
+    </button>
+
+    <button class="tablink" onclick="openTab('Choices', this)">
+      <svg viewBox="0 0 28 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="9" cy="6" r="3"/>
+        <path d="M4 19c0-3.5 2.2-5.5 5-5.5s5 2 5 5.5"/>
+        <circle cx="19" cy="6" r="3"/>
+        <path d="M14 19c0-3.5 2.2-5.5 5-5.5s5 2 5 5.5"/>
+        <circle cx="6" cy="4" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="22" cy="4" r="1" fill="currentColor" stroke="none"/>
+      </svg>
+      <span>Choices</span>
+    </button>
+
+    <button class="tablink" onclick="openTab('ToDo', this)">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8">
+        <rect x="4" y="2" width="16" height="20" rx="2"/>
+        <polyline points="8,9 10,11 14,7"/>
+        <line x1="8" y1="15" x2="16" y2="15"/>
+        <line x1="8" y1="18" x2="14" y2="18"/>
+      </svg>
+      <span>ToDo</span>
+    </button>
+  </div>
+</div>
+
+  
+<script src="js/chart.js"></script>
+<script src="js/chartjs-plugin-datalabels.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
