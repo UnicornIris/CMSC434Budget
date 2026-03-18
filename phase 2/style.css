@@ -16,21 +16,21 @@ body {
     justify-content: space-between; /* Puts space between the two cards */
     gap: 12px;              /* Adds a specific gap between cards */
     width: 100%;            /* Makes the row fill the screen width */
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .card {
     background-color: white;
     border-radius: 12px;
-    padding: 16px;
+    padding: 8px 16px;
     flex: 1;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .app-container {
     max-width: 480px;
-    margin: 0 auto;
-    padding: 20px;
+    margin: -10px auto 0 auto; /* Negative top margin pulls everything UP */
+    padding: 10px 20px 80px 20px;
 }
 
 /* Period card - tappable */
@@ -68,7 +68,7 @@ body {
 /* Spent Today - tappable card */
 .spent-today-card {
     cursor: pointer;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     transition: background-color 0.2s, transform 0.1s;
 }
 .spent-today-card:hover,
@@ -87,11 +87,11 @@ body {
 
 /* Chart section */
 .chart-card {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 .chart-wrapper {
     position: relative;
-    height: 200px;
+    height: 135px;
     margin: 12px 0;
 }
 .chart-legend {
@@ -281,18 +281,154 @@ body {
 /* FAB */
 .fab {
     position: fixed;
-    bottom: 24px;
-    right: 24px;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
+    bottom: 75px;        /* Height above the nav bar */
+    width: 200px;
+    height: 45px;        /* Slightly taller to fit two lines of text better */
+    border-radius: 8px;  /* Changed 2% to 8px for a cleaner look */
     background: #9b7bb8;
     color: white;
     border: none;
-    font-size: 28px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    
+    left: 43%;
+    margin-left: -160px; /* Pulls the first button to the left of the center line */
+    font-family: Ariel;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: large;
+    z-index: 1001;
 }
-.hidden {
-    display: none !important;
+.fab:hover,
+.fab:focus {
+    background-color: #80758d;
+    outline: 2px solid white;
+}
+.fab2 {
+    position: fixed;
+    bottom: 75px;
+    width: 200px;
+    height: 45px;
+    border-radius: 8px;
+    background: #9b7bb8;
+    color: white;
+    border: none;
+ font-family: Ariel;
+    font-weight: bold;
+    font-size: larger;
+    left: 55%;
+    margin-left: 5px;    /* Pushes the second button to the right of the center line */
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    z-index: 1001;
+}
+
+/*navigation tab*/
+.navigationtab{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #e0e0e0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    z-index: 1000; /* Keeps it above other content */
+}
+
+.nav-item {
+    text-decoration: none;
+    color: #757575;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 10px;
+}
+.nav-item i {
+    font-size: 24px;   /* Increased from 20px to make it pop */
+    margin-bottom: 2px; /* Pulls the text closer to the icon */
+}
+
+.nav-item.active {
+    color: #4CAF50; /* Highlight color for current page */
+}
+
+.icon {
+    font-size: 20px;
+    margin-bottom: 2px;
+}
+/*quick add btn*/
+#purch-modal {
+  position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 2000;          /* This sits on top of everything */
+    display: flex;          /* This makes it visible */
+    align-items: flex-end;
+    justify-content: center;
+}
+
+
+/* THE WHITE BOX (The part that slides up) */
+.purch-modal-content {
+    background: white;
+    width: 100%;
+    max-width: 480px;
+    padding: 20px 20px 40px 20px;
+    border-radius: 24px 24px 0 0;
+    animation: sandraSlideUp 0.3s ease-out;
+}
+
+/* THE ANIMATION */
+@keyframes sandraSlideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+/* THE ELEMENTS INSIDE */
+.purch-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.purch-modal-content input, 
+.purch-modal-content select {
+    width: 100%;
+    padding: 15px;
+    margin: 8px 0 20px 0;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    font-size: 18px;
+    box-sizing: border-box; /* Essential to keep inputs from overflowing */
+}
+
+
+.save-btn {
+    width: 100%;
+    padding: 16px;
+    background: #9b7bb8;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* THE MAGIC HIDE RULE (Keep this at the bottom of your CSS) */
+.hidden { 
+    display: none !important; 
+    pointer-events: none !important;
 }

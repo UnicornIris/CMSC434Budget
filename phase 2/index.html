@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Finance App Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -88,15 +89,103 @@
     </div>
 </div>
 
-<button id="quick-add-btn" class="fab">+</button>
+<button id="quick-add-btn" class="fab" onclick="toggleSandra('purchase-modal')">
+    <i class="fa-solid fa-plus"></i>
+    <div class="btn-text">
+        <span class="top-line">Quick Add</span>
+        <span class="bottom-line">Purchase</span>
+    </div>
+</button>
 
-<div id="quick-add-screen" class="hidden">
-  <button
+<div id="purch-modal" class="hidden">
+    <div class="purch-modal-content">
+        <div class="purch-header">
+            <h3>Quick Record</h3>
+            <button class="close-btn" onclick="toggleSandra()">✕</button>
+        </div>
+        
+        <label>Amount</label>
+        <input type="number" id="sandra-amount" placeholder="0.00" inputmode="decimal">
 
-
+        <label>Category</label>
+        <select id="purchase-category">
+            <option value="coffee">🍔 Food</option>
+            <option value="coffee">👕 Clothes</option>
+            <option value="groceries">🛒 Groceries</option>
+            <option value="transport">🚗 Transport</option>
+            <option value="transport">🎬 Entertainment</option>
+            <option value="other"> Other</option>
+        </select>
+        
+       <button class="save-btn" onclick="saveSandra()">SAVE PURCHASE</button>
+    </div>
 </div>
+
+
+<button id="spent-today-btn" class="fab2">$$ Spent Today</button>
+</div>
+<!--javascript-->
+<script>
+function toggleSandra() {
+    console.log("SANDRA Button actually clicked!"); // If you don't see this, the button is blocked.
+    
+    const modal = document.getElementById('purch-modal');
+    
+    if (!modal) {
+        console.error("ERORR: The ID 'purch-modal' does not exist in your HTML!");
+        return;
+    }
+
+    modal.classList.toggle('hidden');
+    console.log("Modal 'hidden' class toggled. Is it hidden now? ", modal.classList.contains('hidden'));
+    
+    if (!modal.classList.contains('hidden')) {
+        document.getElementById('sandra-amount').focus();
+    }
+}
+
+function saveSandra() {
+    const amount = document.getElementById('sandra-amount').value;
+    const category = document.getElementById('purchase-category').value;
+
+    if (amount && amount > 0) {
+        // Log the data (you can replace this with code to update your balance/chart)
+        console.log("Saving Purchase:", { amount, category });
+
+        // Provide feedback (optional: a simple alert or a toast)
+        alert(`Saved $${amount} for ${category}!`);
+
+        // Close the modal after saving
+        toggleSandra();
+    } else {
+        alert("Please enter a valid amount.");
+    }
+}
+
+
+</script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="app.js"></script>
+<nav class="navigationtab">
+<a href="index.html" class="nav-item active">
+       <i class="fa-solid fa-house"></i>
+        <span class="label">Home</span>
+    </a>
+    <a href="activity.html" class="nav-item">
+        <i class="fa-solid fa-money-bill-transfer"></i>
+        <span class="label">Activity</span>
+    </a>
+    <a href="goals.html" class="nav-item">
+       <i class="fa-solid fa-flag-checkered"></i>
+        <span class="label">Goals</span>
+    </a>
+    <a href="settings.html" class="nav-item">
+       <i class="fa-solid fa-user-gear"></i>
+        <span class="label">Settings</span>
+    </a>
+
+</nav>
 </body>
 </html>
