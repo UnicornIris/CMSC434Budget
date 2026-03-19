@@ -2,16 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Goals Page/title>
+    <title>Goals Page</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<div class="app-container">
+    <h2>Goals</h2>
 
+    <!-- Create Goal -->
+    <div class="card">
+        <h3>Create Goal</h3>
+        <input type="text" id="goal-name" placeholder="Goal name (Laptop)">
+        <input type="number" id="goal-amount" placeholder="Target amount">
+        <input type="date" id="goal-date">
+        <button onclick="addGoal()">Add Goal</button>
+    </div>
 
+    <!-- Goals List -->
+    <div id="goals-list"></div>
+</div>
 
-
+<script src="goals.js"></script>
     
 </body>
 </html>

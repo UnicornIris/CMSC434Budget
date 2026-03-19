@@ -432,3 +432,32 @@ body {
     display: none !important; 
     pointer-events: none !important;
 }
+
+#goals-list {
+    margin-top: 20px;
+}
+
+.goal-complete {
+    border-left: 6px solid #2ecc71; /* green */
+    background-color: #eafaf1;
+}
+
+.goal-incomplete {
+    border-left: 6px solid #e74c3c; /* red */
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: #ddd;
+    border-radius: 10px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #9b7bb8;
+    width: 0%;
+    transition: width 0.3s ease;
+}
