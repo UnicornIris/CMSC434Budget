@@ -11,11 +11,14 @@ let transactions = [{
 let categories = ["Entertainment", "Food", "Rent", "Transportation","Shopping",
     "Bills", "Other"];
 
-function renderTransactions(dat = transactions) {
+
+let currentList = transactions;
+
+function renderTransactions(dat = currentList) {
     const list = document.getElementById("transactionList");
     list.innerHTML = "";
 
-    transactions.forEach(x => {
+    dat.forEach(x => {
         const li = document.createElement("li");
 
         li.innerHTML = `
@@ -33,7 +36,7 @@ function renderTransactions(dat = transactions) {
     });
 }
 
-function showForm() {
+function showTransForm() {
     document.getElementById("add-transaction-form").style.display = "block";
 }
 
@@ -65,12 +68,25 @@ function addTransaction() {
     document.getElementById("add-transaction-form").style.display = "none";
 }
 
+function updateCategoryDropdown() {
+    const catInput = document.getElementById("categoryInput");
+    catInput.innerHTML = "";
+
+    categories.forEach(cat => {
+        const option = document.createElement("option");
+        option.value = cat;
+        option.textContent = cat;
+        catInput.appendChild(option);
+    });
+}
+
 function createCategory() {
     const cat = prompt("Enter new category name:");
     if (!cat) return;
 
     if (!categories.includes(cat)) {
         categories.push(cat);
+        updateCategoryDropdown();
         alert("Category added!");
     } else {
         alert("Category already exists.");
@@ -78,38 +94,49 @@ function createCategory() {
 }
 
 function editTransaction(id) {
-    const t = transactions.find(t => t.id === id);
-    if (!t) return;
+    const x = transactions.find(x => x.id === id);
+    if (!x) return;
 
-    const newName = prompt("Edit name:", t.name);
-    const newAmount = parseFloat(prompt("Edit amount:", t.amount));
-    const newCategory = prompt("Edit category:", t.category);
-    const newDate = prompt("Edit date:", t.date);
-    const newNote = prompt("Edit note:", t.note);
+    const newName = prompt("Edit name:", x.name);
+    const newAmount = parseFloat(prompt("Edit amount:", x.amount));
+    const newCategory = prompt("Edit category:", x.category);
+    const newDate = prompt("Edit date:", x.date);
+    const newNote = prompt("Edit note:", x.note);
 
-    t.name = newName;
-    t.amount = newAmount;
-    t.category = newCategory;
-    t.date = newDate;
-    t.note = newNote;
+    x.name = newName;
+    x.amount = newAmount;
+    x.category = newCategory;
+    x.date = newDate;
+    x.note = newNote;
 
     renderTransactions();
+}
+
+function showDateRange() {
+    document.getElementById("date-range").style.display = "block";
 }
 
 function rangeOfTransactions() {
-    const start = prompt("Start date (YYYY-MM-DD):");
-    const end = prompt("End date (YYYY-MM-DD):");
+    const start = document.getElementById("startDate").value;
+    const end = document.getElementById("endDate").value;
 
-    const filtered = transactions.filter(x => {
+    currentList = transactions.filter(x => {
         return x.date >= start && x.date <= end;
     });
 
-    renderTransactions(filtered);
+    renderTransactions(currentList);
 }
 
 function deleteTransaction(id) {
-    transactions = transactions.filter(t => t.id !== id);
+    transactions = transactions.filter(x => x.id !== id);
     renderTransactions();
 }
+
+function showAllTransactions() {
+    currentList = transactions;
+    renderTransactions();
+}
+
+
 
 renderTransactions();
