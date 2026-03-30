@@ -6,11 +6,10 @@
 </head>
 <body>
     <h1>Transactions</h1>
-    <button onclick="showForm()">Add New Transaction</button>
-    <!-- <button onclick="addTransaction()">Manual Entry</button> -->
+    <button onclick="showTransForm()">Add New Transaction</button>
     <button onclick="createCategory()">Add New Category</button>
-    <button onclick="rangeOfTransactions()">Date Range</button>
-
+    <button onclick="showDateRange()">Date Range</button>
+    <button onclick="showAllTransactions()">Show All</button>
 
 
   <div id="add-transaction-form" style="display: none;">
@@ -41,6 +40,15 @@
 
   <h2>Your Transactions</h2>
   <ul id="transactionList"></ul>
+
+  <div id="date-range" style="display:none;">
+    <h3>Select Date Range</h3>
+  
+    <input type="date" id="startDate">
+    <input type="date" id="endDate">
+  
+    <button onclick="rangeOfTransactions()">Apply</button>
+  </div>
 
   <script src="transactions_script.js"></script>
 
