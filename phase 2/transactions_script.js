@@ -16,7 +16,7 @@ let categories = ["Entertainment", "Food", "Rent", "Transportation","Shopping",
 
 
 let currentList = transactions;
-
+let editingId = null;
 function renderTransactions(dat = currentList) {
     const list = document.getElementById("transactionList");
     list.innerHTML = "";
@@ -60,8 +60,9 @@ function addTransaction() {
     };
 
     transactions.push(newTransaction);
+    currentList = transactions;
 
-    renderTransactions();
+    renderTransactions(currentList);
 
     document.getElementById("nameInput").value = "";
     document.getElementById("amountInput").value = "";
@@ -109,7 +110,7 @@ function saveEdit() {
     x.date = document.getElementById("editDate").value;
     x.note = document.getElementById("editNote").value;
 
-    renderTransactions();
+    renderTransactions(currentList);
 
     document.getElementById("edit-form").style.display = "none";
 }
@@ -161,12 +162,14 @@ function rangeOfTransactions() {
 
 function deleteTransaction(id) {
     transactions = transactions.filter(x => x.id !== id);
-    renderTransactions();
+    currentList = transactions;
+
+    renderTransactions(currentList);
 }
 
 function showAllTransactions() {
     currentList = transactions;
-    renderTransactions();
+    renderTransactions(currentList);
 }
 
 
