@@ -2,51 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Goals Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Goals — Budget</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class="phone-frame">
+<div class="app-container goals-page">
+    <header class="screen-header">
+        <h1 class="screen-title">Goals</h1>
+        <p class="screen-subtitle">Set a target amount and date for something you’re saving for.</p>
+    </header>
 
-<div class="app-container">
-    <h2>Goals</h2>
-
-    <!-- Create Goal -->
     <div class="card">
-        <h3>Create Goal</h3>
-        <input type="text" id="goal-name" placeholder="Goal name (Laptop)">
+        <h3 class="card-section-title">Create goal</h3>
+        <input type="text" id="goal-name" placeholder="Goal name (e.g. Laptop)">
         <input type="number" id="goal-amount" placeholder="Target amount">
         <input type="date" id="goal-date">
-        <button onclick="addGoal()">Add Goal</button>
+        <button type="button" onclick="addGoal()">Add goal</button>
     </div>
 
-    <!-- Goals List -->
+    <h2 class="screen-title" style="font-size:1.125rem;margin-top:16px;">Active goals</h2>
     <div id="goals-list" class="goals-list"></div>
-    <h2>Completed Goals</h2>
+    <h2 class="screen-title" style="font-size:1.125rem;margin-top:16px;">Completed goals</h2>
     <div id="completed-goals-list"></div>
 </div>
 
 <script src="goals.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="app.js"></script>
 
-<nav class="navigationtab">  
-<a href="index.html" class="nav-item active">
-       <i class="fa-solid fa-house"></i>
-        <span class="label">Home</span>
-    </a>
-    <a href="activity.html" class="nav-item"> 
-        <i class="fa-solid fa-money-bill-transfer"></i>
+<nav class="navigationtab" aria-label="Main">
+    <a href="activity.html" class="nav-item">
+        <i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i>
         <span class="label">Activity</span>
     </a>
-    <a href="goals.html" class="nav-item">
-      <i class="fa-solid fa-flag-checkered" style="color: #4CAF50"></i>
-        <span class="label" style="color: #4CAF50;">Goals</span>
+    <a href="goals.html" class="nav-item active">
+        <i class="fa-solid fa-flag-checkered" aria-hidden="true"></i>
+        <span class="label">Goals</span>
     </a>
     <a href="settings.html" class="nav-item">
-       <i class="fa-solid fa-user-gear"></i>
-        <span class="label">Settings</span> 
+        <i class="fa-solid fa-user-gear" aria-hidden="true"></i>
+        <span class="label">Settings</span>
     </a>
 </nav>
+</div>
 </body>
 </html>

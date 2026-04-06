@@ -6,12 +6,22 @@
 }
 
 body {
-    background-color: var(--sage-green); /* The base green background */
+    background-color: var(--sage-green);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+}
+
+/* Inside app phone shell (loads after style.css on settings page) */
+.phone-frame .settings-header {
+    color: var(--text-on-page, #1a1224);
+    padding-top: 12px;
+    padding-bottom: 8px;
+}
+.phone-frame .menu-btn {
+    color: var(--text-on-page, #1a1224);
 }
 
 /* Centering the Title */

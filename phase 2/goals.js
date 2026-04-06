@@ -1,7 +1,11 @@
 const GOALS_KEY = "budget-goals";
 
 function loadGoals() {
-    return JSON.parse(localStorage.getItem(GOALS_KEY)) || [];
+    try {
+        const raw = localStorage.getItem(GOALS_KEY);
+        if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return [];
 }
 
 function saveGoals(goals) {
@@ -44,45 +48,6 @@ function getMonthsLeft(date) {
     return Math.max(1, (target.getFullYear() - now.getFullYear()) * 12 + (target.getMonth() - now.getMonth()));
 }
 
-function renderGoals() {
-    const goals = loadGoals();
-    const container = document.getElementById("goals-list");
-    container.innerHTML = "";
-
-    goals.forEach(g => {
-        const percent = ((g.saved / g.amount) * 100).toFixed(0);
-        const remaining = g.amount - g.saved;
-
-        const div = document.createElement("div");
-
-        div.className = "goal-card " + (g.saved >= g.amount ? "goal-complete" : "goal-incomplete");
-        div.innerHTML = `
-            <h3>${g.name}</h3>
-
-            <p class="goal-numbers">
-                $${g.saved.toFixed(0)} / $${g.amount.toFixed(0)}
-            </p>
-
-            <p class="goal-percent">
-                ${percent}% complete
-            </p>
-
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: ${percent}%"></div>
-            </div>
-
-            <p class="goal-date">Due: ${g.date}</p>
-
-            <div class="goal-actions">
-                <button onclick="addMoney(${g.id})">+ $50</button>
-                <button onclick="editGoal(${g.id})">Edit</button>
-            </div>
-        `;
-
-        container.appendChild(div);
-    });
-}
-
 function toggleView(id) {
     const goals = loadGoals();
     const goal = goals.find(g => g.id === id);
@@ -110,15 +75,14 @@ function editGoal(id) {
 function addMoney(id) {
     const goals = loadGoals();
     const goal = goals.find(g => g.id === id);
-
+    if (!goal) return;
     const amount = prompt("How much did you save?");
-    goal.saved += parseFloat(amount);
-
+    const n = parseFloat(amount);
+    if (amount === null || amount === "" || Number.isNaN(n)) return;
+    goal.saved += n;
     saveGoals(goals);
     renderGoals();
 }
-
-document.addEventListener("DOMContentLoaded", renderGoals);
 
 function renderGoals() {
     const goals = loadGoals();
@@ -170,3 +134,5 @@ function renderGoals() {
         }
     });
 }
+
+document.addEventListener("DOMContentLoaded", renderGoals);

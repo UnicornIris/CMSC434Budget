@@ -1,14 +1,14 @@
 /**
  * Finance App - Phase 2
- * ANANT's tasks: Money Spent Today, Toggling Views, Filtering by Period
+ * Period summary, spent today, income logging, period filter
  */
 
 const STORAGE_KEY = 'budget-transactions';
 const STORAGE_KEY_INCOME = 'budget-income';
 const STORAGE_KEY_PERIOD = 'budget-period';
 const CATEGORIES = ['Food', 'Coffee', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Other'];
+const INCOME_SOURCES = ['Salary', 'Freelance', 'Side job', 'Gift', 'Refund', 'Other'];
 
-// Sample expense transactions
 function getDefaultTransactions() {
     const today = formatDateForStorage(new Date());
     const d = new Date();
@@ -23,22 +23,34 @@ function getDefaultTransactions() {
     ];
 }
 
-// Sample income entries with dates
 function getDefaultIncome() {
     const d = new Date();
     const y = d.getFullYear(), m = d.getMonth();
+    const p = n => String(n).padStart(2, '0');
     return [
-        { date: `${y}-${String(m + 1).padStart(2, '0')}-01`, amount: 2500 },
-        { date: `${y}-${String(m + 1).padStart(2, '0')}-15`, amount: 1000 }
+        { id: generateId(), name: 'Salary', date: `${y}-${p(m + 1)}-01`, amount: 2500, source: 'Salary' },
+        { id: generateId(), name: 'Freelance', date: `${y}-${p(m + 1)}-15`, amount: 1000, source: 'Freelance' }
     ];
+}
+
+function normalizeIncomeEntry(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    const amount = Math.max(0, parseFloat(raw.amount) || 0);
+    const date = raw.date || formatDateForStorage(new Date());
+    const source = INCOME_SOURCES.includes(raw.source) ? raw.source : 'Other';
+    return {
+        id: raw.id || generateId(),
+        name: (raw.name && String(raw.name).trim()) || 'Income',
+        amount,
+        date,
+        source
+    };
 }
 
 function loadTransactions() {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-            return JSON.parse(raw);
-        }
+        if (raw) return JSON.parse(raw);
     } catch (e) {}
     return getDefaultTransactions();
 }
@@ -50,7 +62,10 @@ function saveTransactions(tx) {
 function loadIncome() {
     try {
         const raw = localStorage.getItem(STORAGE_KEY_INCOME);
-        if (raw) return JSON.parse(raw);
+        if (raw) {
+            const arr = JSON.parse(raw);
+            if (Array.isArray(arr)) return arr.map(normalizeIncomeEntry).filter(Boolean);
+        }
     } catch (e) {}
     return getDefaultIncome();
 }
@@ -79,31 +94,32 @@ function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
 
-// --- Period filtering ---
 function getDateRangeForPeriod(period) {
     const end = new Date();
     const start = new Date();
     end.setHours(23, 59, 59, 999);
     start.setHours(0, 0, 0, 0);
 
-    if (period === '7') {
-        start.setDate(end.getDate() - 6);
-    } else if (period === '14') {
-        start.setDate(end.getDate() - 13);
-    } else if (period === '30') {
-        start.setDate(end.getDate() - 29);
-    } else {
-        // This Month
-        start.setDate(1);
-    }
+    if (period === '7') start.setDate(end.getDate() - 6);
+    else if (period === '14') start.setDate(end.getDate() - 13);
+    else if (period === '30') start.setDate(end.getDate() - 29);
+    else start.setDate(1);
     return { start, end };
 }
 
 function formatPeriodLabel(period) {
     const { start, end } = getDateRangeForPeriod(period);
     const fmt = d => (d.getMonth() + 1) + '/' + d.getDate();
-    if (period === 'month') return 'This Month';
-    return fmt(start) + ' - ' + fmt(end);
+    if (period === 'month') return 'This month';
+    return fmt(start) + ' – ' + fmt(end);
+}
+
+function formatPeriodContextPhrase(period) {
+    if (period === 'month') return 'this month';
+    if (period === '7') return 'the last 7 days';
+    if (period === '14') return 'the last 14 days';
+    if (period === '30') return 'the last 30 days';
+    return 'the selected range';
 }
 
 function isDateInRange(dateStr, start, end) {
@@ -123,14 +139,25 @@ function getFilteredTotals() {
     return { income, expenses };
 }
 
-// --- State ---
+function getFilteredIncomeEntries() {
+    const { start, end } = getDateRangeForPeriod(selectedPeriod);
+    return incomeEntries
+        .filter(i => isDateInRange(i.date, start, end))
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+}
+
+function formatShortDateDisplay(dateStr) {
+    const d = new Date(dateStr + 'T12:00:00');
+    if (Number.isNaN(d.getTime())) return dateStr;
+    return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+}
+
 let transactions = loadTransactions();
 let incomeEntries = loadIncome();
 let selectedPeriod = loadSelectedPeriod();
-let progressChart = null;
 let editingTransactionId = null;
+let editingIncomeId = null;
 
-// --- DOM ---
 const spentTodayCard = document.getElementById('spent-today-card');
 const spentTodayAmount = document.getElementById('spent-today-amount');
 const todayTransactionsView = document.getElementById('today-transactions-view');
@@ -142,13 +169,33 @@ const editAmount = document.getElementById('edit-amount');
 const editCategory = document.getElementById('edit-category');
 const editSaveBtn = document.getElementById('edit-save-btn');
 const editCancelBtn = document.getElementById('edit-cancel-btn');
-const legendIncome = document.getElementById('legend-income');
-const legendExpenses = document.getElementById('legend-expenses');
 const periodCard = document.getElementById('period-card');
 const periodLabel = document.getElementById('period-label');
 const periodModal = document.getElementById('period-modal');
+const balanceAmountEl = document.getElementById('balance-amount');
+const statIncomeEl = document.getElementById('stat-income');
+const statExpensesEl = document.getElementById('stat-expenses');
+const statNetEl = document.getElementById('stat-net');
+const barIncomeEl = document.getElementById('bar-income');
+const barExpensesEl = document.getElementById('bar-expenses');
+const progressPeriodContextEl = document.getElementById('progress-period-context');
+const incomeEntriesView = document.getElementById('income-entries-view');
+const incomeEntriesList = document.getElementById('income-entries-list');
+const incomeListBackBtn = document.getElementById('income-list-back-btn');
+const incomeListAddBtn = document.getElementById('income-list-add-btn');
+const incomeListPeriodLabel = document.getElementById('income-list-period-label');
+const incomeModal = document.getElementById('income-modal');
+const btnOpenIncomeModal = document.getElementById('btn-open-income-modal');
+const btnOpenIncomeList = document.getElementById('btn-open-income-list');
+const incomeSaveBtn = document.getElementById('income-save-btn');
+const incomeCancelBtn = document.getElementById('income-cancel-btn');
 
-// --- Today's transactions ---
+function populateIncomeSourceSelect() {
+    const sel = document.getElementById('income-source');
+    if (!sel) return;
+    sel.innerHTML = INCOME_SOURCES.map(s => `<option value="${s}">${s}</option>`).join('');
+}
+
 function getTodayTransactions() {
     const today = formatDateForStorage(new Date());
     return transactions.filter(t => t.date === today);
@@ -159,15 +206,37 @@ function computeSpentToday() {
 }
 
 function updateSpentTodayDisplay() {
-    spentTodayAmount.textContent = formatCurrency(computeSpentToday());
+    if (spentTodayAmount) spentTodayAmount.textContent = formatCurrency(computeSpentToday());
+}
+
+function updateProgressSummary() {
+    const { income, expenses } = getFilteredTotals();
+    const net = income - expenses;
+    const maxVal = Math.max(income, expenses, 1);
+    const incomePct = Math.round((income / maxVal) * 100);
+    const expensesPct = Math.round((expenses / maxVal) * 100);
+
+    if (balanceAmountEl) balanceAmountEl.textContent = formatCurrency(net);
+    if (statIncomeEl) statIncomeEl.textContent = formatCurrency(income);
+    if (statExpensesEl) statExpensesEl.textContent = formatCurrency(expenses);
+    if (statNetEl) {
+        statNetEl.textContent = formatCurrency(net);
+        statNetEl.classList.remove('stat-net-negative', 'stat-net-positive');
+        if (net < 0) statNetEl.classList.add('stat-net-negative');
+        else if (net > 0) statNetEl.classList.add('stat-net-positive');
+    }
+    if (barIncomeEl) barIncomeEl.style.width = incomePct + '%';
+    if (barExpensesEl) barExpensesEl.style.width = expensesPct + '%';
+    if (progressPeriodContextEl) progressPeriodContextEl.textContent = formatPeriodContextPhrase(selectedPeriod);
 }
 
 function renderTodayTransactionsList() {
+    if (!todayTransactionsList) return;
     const today = getTodayTransactions();
     todayTransactionsList.innerHTML = '';
 
     if (today.length === 0) {
-        todayTransactionsList.innerHTML = '<li class="transaction-item" style="text-align:center;color:#666;">No transactions today.</li>';
+        todayTransactionsList.innerHTML = '<li class="transaction-item transaction-empty">No transactions today.</li>';
         return;
     }
 
@@ -183,8 +252,8 @@ function renderTodayTransactionsList() {
             </div>
             <span class="transaction-amount">${formatCurrency(t.amount)}</span>
             <div class="transaction-actions">
-                <button class="btn-edit" data-action="edit" data-id="${t.id}">Edit</button>
-                <button class="btn-delete" data-action="delete" data-id="${t.id}">Delete</button>
+                <button type="button" class="btn-edit" data-action="edit" data-id="${t.id}">Edit</button>
+                <button type="button" class="btn-delete" data-action="delete" data-id="${t.id}">Delete</button>
             </div>
         `;
         todayTransactionsList.appendChild(li);
@@ -215,7 +284,7 @@ function escapeHtml(text) {
 
 function openEditModal(id) {
     const t = transactions.find(x => x.id === id);
-    if (!t) return;
+    if (!t || !editModal) return;
     editingTransactionId = id;
     editName.value = t.name;
     editAmount.value = t.amount;
@@ -225,7 +294,7 @@ function openEditModal(id) {
 
 function closeEditModal() {
     editingTransactionId = null;
-    editModal.classList.add('hidden');
+    if (editModal) editModal.classList.add('hidden');
 }
 
 function saveEditedTransaction() {
@@ -244,7 +313,7 @@ function saveEditedTransaction() {
 
     renderTodayTransactionsList();
     updateSpentTodayDisplay();
-    updateChartWithFilteredData();
+    updateProgressSummary();
     closeEditModal();
 }
 
@@ -260,136 +329,206 @@ function deleteTransaction(id) {
     saveTransactions(transactions);
     renderTodayTransactionsList();
     updateSpentTodayDisplay();
-    updateChartWithFilteredData();
+    updateProgressSummary();
 }
 
-// --- Spent Today tap -> show today's transactions ---
 function showTodayTransactionsView() {
     renderTodayTransactionsList();
-    todayTransactionsView.classList.remove('hidden');
+    if (todayTransactionsView) todayTransactionsView.classList.remove('hidden');
 }
 
 function hideTodayTransactionsView() {
-    todayTransactionsView.classList.add('hidden');
+    if (todayTransactionsView) todayTransactionsView.classList.add('hidden');
 }
 
-spentTodayCard.addEventListener('click', showTodayTransactionsView);
-spentTodayCard.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        showTodayTransactionsView();
+function openIncomeModal(existingId) {
+    if (!incomeModal) return;
+    editingIncomeId = existingId || null;
+    const titleEl = document.getElementById('income-modal-title');
+    const nameEl = document.getElementById('income-name');
+    const amountEl = document.getElementById('income-amount');
+    const dateEl = document.getElementById('income-date');
+    const sourceEl = document.getElementById('income-source');
+    if (existingId) {
+        const e = incomeEntries.find(x => x.id === existingId);
+        if (!e) return;
+        if (titleEl) titleEl.textContent = 'Edit income';
+        if (nameEl) nameEl.value = e.name;
+        if (amountEl) amountEl.value = String(e.amount);
+        if (dateEl) dateEl.value = e.date;
+        if (sourceEl) sourceEl.value = INCOME_SOURCES.includes(e.source) ? e.source : 'Other';
+    } else {
+        if (titleEl) titleEl.textContent = 'Add income';
+        if (nameEl) nameEl.value = '';
+        if (amountEl) amountEl.value = '';
+        if (dateEl) dateEl.value = formatDateForStorage(new Date());
+        if (sourceEl) sourceEl.value = 'Salary';
     }
-});
-backBtn.addEventListener('click', hideTodayTransactionsView);
-editSaveBtn.addEventListener('click', saveEditedTransaction);
-editCancelBtn.addEventListener('click', closeEditModal);
-
-// --- Progress Chart & Toggling ---
-function updateChartWithFilteredData() {
-    const { income, expenses } = getFilteredTotals();
-    if (progressChart && progressChart.data && progressChart.data.datasets) {
-        progressChart.data.datasets[0].data = [income, null];
-        progressChart.data.datasets[1].data = [null, expenses];
-        progressChart.update();
-    }
+    incomeModal.classList.remove('hidden');
 }
 
-function initProgressChart() {
-    const canvas = document.getElementById('progressChart');
-    if (!canvas) return;
+function closeIncomeModal() {
+    editingIncomeId = null;
+    if (incomeModal) incomeModal.classList.add('hidden');
+}
 
-    const ctx = canvas.getContext('2d');
-    const { income, expenses } = getFilteredTotals();
-
-    progressChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Income', 'Expenses'],
-            datasets: [
-                {
-                    label: 'Income',
-                    data: [income, null],
-                    backgroundColor: 'rgba(46, 204, 113, 0.8)',
-                    borderColor: 'rgb(46, 204, 113)',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Expenses',
-                    data: [null, expenses],
-                    backgroundColor: 'rgba(231, 76, 60, 0.8)',
-                    borderColor: 'rgb(231, 76, 60)',
-                    borderWidth: 1
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: (ctx) => ctx.raw != null ? formatCurrency(ctx.raw) : ''
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: (v) => formatCurrency(v)
-                    }
-                }
-            }
+function saveIncomeFromModal() {
+    const nameEl = document.getElementById('income-name');
+    const amountEl = document.getElementById('income-amount');
+    const dateEl = document.getElementById('income-date');
+    const sourceEl = document.getElementById('income-source');
+    const name = (nameEl && nameEl.value.trim()) || 'Income';
+    const amount = Math.max(0, parseFloat(amountEl && amountEl.value) || 0);
+    const dateStr = (dateEl && dateEl.value) || formatDateForStorage(new Date());
+    const source = (sourceEl && sourceEl.value) || 'Other';
+    if (amount <= 0) {
+        alert('Please enter a positive amount.');
+        return;
+    }
+    if (editingIncomeId) {
+        const e = incomeEntries.find(x => x.id === editingIncomeId);
+        if (e) {
+            e.name = name;
+            e.amount = amount;
+            e.date = dateStr;
+            e.source = source;
         }
+    } else {
+        incomeEntries.push({
+            id: generateId(),
+            name,
+            amount,
+            date: dateStr,
+            source
+        });
+    }
+    saveIncome(incomeEntries);
+    closeIncomeModal();
+    updateProgressSummary();
+    renderIncomeEntriesList();
+}
+
+function deleteIncomeEntry(id) {
+    incomeEntries = incomeEntries.filter(i => i.id !== id);
+    saveIncome(incomeEntries);
+    updateProgressSummary();
+    renderIncomeEntriesList();
+}
+
+function renderIncomeEntriesList() {
+    if (!incomeEntriesList) return;
+    const rows = getFilteredIncomeEntries();
+    incomeEntriesList.innerHTML = '';
+    if (rows.length === 0) {
+        incomeEntriesList.innerHTML = '<li class="transaction-item transaction-empty">No income entries in this period.</li>';
+        return;
+    }
+    rows.forEach(i => {
+        const li = document.createElement('li');
+        li.className = 'transaction-item';
+        li.dataset.id = i.id;
+        li.innerHTML = `
+            <div class="transaction-info">
+                <span class="transaction-name">${escapeHtml(i.name)}</span>
+                <span class="income-entry-meta">${escapeHtml(i.source)} · ${formatShortDateDisplay(i.date)}</span>
+            </div>
+            <span class="transaction-amount-income">+${formatCurrency(i.amount)}</span>
+            <div class="transaction-actions">
+                <button type="button" class="btn-edit" data-income-action="edit" data-id="${escapeHtml(i.id)}">Edit</button>
+                <button type="button" class="btn-delete" data-income-action="delete" data-id="${escapeHtml(i.id)}">Delete</button>
+            </div>
+        `;
+        incomeEntriesList.appendChild(li);
+    });
+    incomeEntriesList.querySelectorAll('[data-income-action="edit"]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openIncomeModal(btn.dataset.id);
+        });
+    });
+    incomeEntriesList.querySelectorAll('[data-income-action="delete"]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteIncomeEntry(btn.dataset.id);
+        });
     });
 }
 
-function toggleDatasetVisibility(datasetIndex) {
-    if (!progressChart || !progressChart.data.datasets[datasetIndex]) return;
-    const meta = progressChart.getDatasetMeta(datasetIndex);
-    meta.hidden = !meta.hidden;
-    progressChart.update();
-    const legendEl = datasetIndex === 0 ? legendIncome : legendExpenses;
-    legendEl.classList.toggle('inactive', meta.hidden);
+function showIncomeEntriesView() {
+    if (incomeListPeriodLabel) {
+        incomeListPeriodLabel.textContent = 'Showing: ' + formatPeriodLabel(selectedPeriod);
+    }
+    renderIncomeEntriesList();
+    if (incomeEntriesView) incomeEntriesView.classList.remove('hidden');
 }
 
-legendIncome.addEventListener('click', () => toggleDatasetVisibility(0));
-legendExpenses.addEventListener('click', () => toggleDatasetVisibility(1));
+function hideIncomeEntriesView() {
+    if (incomeEntriesView) incomeEntriesView.classList.add('hidden');
+}
 
-// --- Period filtering ---
+if (spentTodayCard) {
+    spentTodayCard.addEventListener('click', showTodayTransactionsView);
+    spentTodayCard.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            showTodayTransactionsView();
+        }
+    });
+}
+if (backBtn) backBtn.addEventListener('click', hideTodayTransactionsView);
+if (editSaveBtn) editSaveBtn.addEventListener('click', saveEditedTransaction);
+if (editCancelBtn) editCancelBtn.addEventListener('click', closeEditModal);
+
+if (btnOpenIncomeModal) btnOpenIncomeModal.addEventListener('click', () => openIncomeModal(null));
+if (btnOpenIncomeList) btnOpenIncomeList.addEventListener('click', showIncomeEntriesView);
+if (incomeListBackBtn) incomeListBackBtn.addEventListener('click', hideIncomeEntriesView);
+if (incomeListAddBtn) incomeListAddBtn.addEventListener('click', () => openIncomeModal(null));
+if (incomeSaveBtn) incomeSaveBtn.addEventListener('click', saveIncomeFromModal);
+if (incomeCancelBtn) incomeCancelBtn.addEventListener('click', closeIncomeModal);
+
 function openPeriodModal() {
-    periodModal.classList.remove('hidden');
+    if (periodModal) periodModal.classList.remove('hidden');
 }
 
 function closePeriodModal() {
-    periodModal.classList.add('hidden');
+    if (periodModal) periodModal.classList.add('hidden');
 }
 
 function selectPeriod(period) {
     selectedPeriod = period;
     saveSelectedPeriod(period);
-    periodLabel.textContent = formatPeriodLabel(period);
-    updateChartWithFilteredData();
+    if (periodLabel) periodLabel.textContent = formatPeriodLabel(period);
+    updateProgressSummary();
     closePeriodModal();
+    if (incomeEntriesView && !incomeEntriesView.classList.contains('hidden')) {
+        if (incomeListPeriodLabel) {
+            incomeListPeriodLabel.textContent = 'Showing: ' + formatPeriodLabel(selectedPeriod);
+        }
+        renderIncomeEntriesList();
+    }
 }
 
-periodCard.addEventListener('click', openPeriodModal);
-periodCard.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        openPeriodModal();
-    }
-});
+if (periodCard) {
+    periodCard.addEventListener('click', openPeriodModal);
+    periodCard.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openPeriodModal();
+        }
+    });
+}
 
-periodModal.querySelectorAll('.period-option').forEach(btn => {
-    btn.addEventListener('click', () => selectPeriod(btn.dataset.period));
-});
-document.getElementById('period-close-btn').addEventListener('click', closePeriodModal);
+if (periodModal) {
+    periodModal.querySelectorAll('.period-option').forEach(btn => {
+        btn.addEventListener('click', () => selectPeriod(btn.dataset.period));
+    });
+    const closeBtn = document.getElementById('period-close-btn');
+    if (closeBtn) closeBtn.addEventListener('click', closePeriodModal);
+}
 
-// --- Init ---
 document.addEventListener('DOMContentLoaded', () => {
+    populateIncomeSourceSelect();
     updateSpentTodayDisplay();
-    periodLabel.textContent = formatPeriodLabel(selectedPeriod);
-    initProgressChart();
+    if (periodLabel) periodLabel.textContent = formatPeriodLabel(selectedPeriod);
+    updateProgressSummary();
 });

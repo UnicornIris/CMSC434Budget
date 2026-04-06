@@ -2,113 +2,74 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Settings Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Settings — Budget</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="settings.css">
 </head>
 <body>
- <header class="settings-header">
-        <button class="menu-btn" aria-label="Open Menu">
-            <i class="fa-solid fa-bars"></i>
-        </button>
-        <h1 style="text-align: center; width: 100%;">Settings</h1>
-    </header>
+<div class="phone-frame">
+<header class="settings-header">
+    <button type="button" class="menu-btn" aria-label="Open Menu">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <h1>Settings</h1>
+</header>
 
-    <main class="settings-container">
-        
-        <section class="settings-group">
-            <h2 class="group-title">Preferences</h2>
-            
-            <div class="setting-item">
-                <div class="setting-info">
-                    <i class="fa-solid fa-money-bill-transfer"></i>
-                    <span>Primary Currency: <span id="currencyDisplay">USD</span></span>
-                </div>
-                <button class="toggle-btn" id="currencyToggle" onclick="toggleCurrency()">Toggle USD/EUR</button>
+<main class="settings-container app-container">
+    <section class="settings-group">
+        <h2 class="group-title">Preferences</h2>
+        <div class="setting-item">
+            <div class="setting-info">
+                <i class="fa-solid fa-money-bill-transfer"></i>
+                <span>Primary Currency: <span id="currencyDisplay">USD</span></span>
             </div>
-        </section>
+            <button type="button" class="toggle-btn" id="currencyToggle" onclick="toggleCurrency()">Toggle USD/EUR</button>
+        </div>
+    </section>
 
-        <section class="settings-group">
-            <h2 class="group-title">Notifications</h2>
-            
-            <div class="setting-item">
-                <div class="setting-info">
-                    <i class="fa-solid fa-bell"></i>
-                    <span>Low Balance Alerts</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="lowBalanceToggle" onchange="saveSettings()" checked>
-                    <span class="slider"></span>
-                </label>
+    <section class="settings-group">
+        <h2 class="group-title">Notifications</h2>
+        <div class="setting-item">
+            <div class="setting-info">
+                <i class="fa-solid fa-bell"></i>
+                <span>Low Balance Alerts</span>
             </div>
-
-            <div class="setting-item">
-                <div class="setting-info">
-                    <i class="fa-solid fa-calendar-check"></i>
-                    <span>Bill Due Reminders</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="billDueToggle" onchange="saveSettings()" checked>
-                    <span class="slider"></span>
-                </label>
+            <label class="switch">
+                <input type="checkbox" id="lowBalanceToggle" onchange="saveSettings()" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="setting-item">
+            <div class="setting-info">
+                <i class="fa-solid fa-calendar-check"></i>
+                <span>Bill Due Reminders</span>
             </div>
-        </section>
-    </main>
+            <label class="switch">
+                <input type="checkbox" id="billDueToggle" onchange="saveSettings()" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+    </section>
+</main>
 
-        </section>
+<script src="settings.js"></script>
 
-        <section class="settings-group">
-            <h2 class="group-title">Notifications</h2>
-            
-            <div class="setting-item">
-                <div class="setting-info">
-                    <span>Low Balance Alerts</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-
-            <div class="setting-item">
-                <div class="setting-info">
-                    <span>Bill Due Reminders</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </section>
-
-    </main>
-
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="app.js"></script>
-
-<nav class="navigationtab">  
-<a href="index.html" class="nav-item active">
-       <i class="fa-solid fa-house"></i>
-        <span class="label">Home</span>
-    </a>
-    <a href="activity.html" class="nav-item"> 
-        <i class="fa-solid fa-money-bill-transfer"></i>
+<nav class="navigationtab" aria-label="Main">
+    <a href="activity.html" class="nav-item">
+        <i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i>
         <span class="label">Activity</span>
     </a>
     <a href="goals.html" class="nav-item">
-       <i class="fa-solid fa-flag-checkered"></i>
+        <i class="fa-solid fa-flag-checkered" aria-hidden="true"></i>
         <span class="label">Goals</span>
     </a>
-    <a href="settings.html" class="nav-item">
-      <i class="fa-solid fa-user-gear" style="color: #4CAF50;"></i>
-        <span class="label" style="color: #4CAF50;">Settings</span> 
+    <a href="settings.html" class="nav-item active">
+        <i class="fa-solid fa-user-gear" aria-hidden="true"></i>
+        <span class="label">Settings</span>
     </a>
 </nav>
-
-<script src="settings.js"></script>
-    
-    
+</div>
 </body>
 </html>
-

@@ -16,8 +16,8 @@ function saveSettings() {
     const lowBalanceAlert = document.getElementById("lowBalanceToggle").checked;
     const billDueAlert = document.getElementById("billDueToggle").checked;
 
-    console.log("Low balance:", lowBalance);
-    console.log("Bill due:", billDue);
+    console.log("Low balance:", lowBalanceAlert);
+    console.log("Bill due:", billDueAlert);
 }
 
 loadSettings();
