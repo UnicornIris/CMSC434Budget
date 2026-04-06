@@ -42,8 +42,8 @@ body {
 .phone-frame {
     width: 100%;
     max-width: var(--frame-max);
-    min-height: 100dvh;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;  
     margin: 0 auto;
     position: relative;
     background-color: var(--bg-page);
@@ -121,6 +121,11 @@ body {
 }
 
 .app-container {
+    flex: 1;                  
+    overflow-y: auto; 
+    min-height: 100%;
+    display: block;
+    flex-direction: column;
     box-sizing: border-box;
     width: 100%;
     max-width: none;
@@ -797,4 +802,8 @@ body {
     background: var(--btn-primary-bg);
     width: 0%;
     transition: width 0.3s ease;
+}
+.goals-page {
+    height: 100%;
+    overflow-y: auto;
 }
