@@ -1,0 +1,15 @@
+:root {
+    --sage-green: #597D5E;
+    --card-white: #FFFFFF;
+    --text-dark: #222222;
+    --text-muted: #555555;
+}
+
+body {
+    background-color: var(--sage-green); /* The base green background */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
