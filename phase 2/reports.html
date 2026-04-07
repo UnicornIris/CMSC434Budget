@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Goals — Budget</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="phone-frame">
+        <div class="app-container goals-page">
+            <header class="screen-header">
+                <h1 class="screen-title">Reports</h1>
+            </header>
+
+            <select id="chartType" class="dropdown-select">
+                <option value="bar">Bar Chart</option>
+                <option value="pie">Pie Chart</option>
+                <option value="line">Line Chart</option>
+            </select>
+
+            <select id="timeRange" class="btn-income-tool btn-income-tool-secondary">
+                <option value="monthly">Monthly</option>
+                <option value="weekly">Weekly</option>
+                <option value="yearly">Yearly</option>
+                <option value="daily">Daily</option>
+            </select>
+            
+        </div>
+
+        
+            
+
+        <div class="chart-wrapper">
+            <canvas id="myChart"></canvas>
+        </div>
+
+        <div class="card">
+            <h2 class="card-section-title">Recent Transactions</h2>
+        
+            <ul id="transactions-list" class="card">
+            </ul>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0">
+        </script>
+        <script src="reports.js"></script>
+        
+
+        <nav class="navigationtab" aria-label="Main">
+            <a href="activity.html" class="nav-item">
+                <i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i>
+                <span class="label">Activity</span>
+            </a>
+            <a href="goals.html" class="nav-item active">
+                <i class="fa-solid fa-flag-checkered" aria-hidden="true"></i>
+                <span class="label">Goals</span>
+            </a>
+            <a href="reports.html" class="nav-item active">
+                <i class="fa-solid fa-chart-column" aria-hidden="true" style="color: #4CAF50;"></i>
+                <span class="label" style="color: #4CAF50; font-weight: bold;">Reports</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fa-solid fa-user-gear" aria-hidden="true"></i>
+                <span class="label">Settings</span>
+            </a>
+        </nav>
+    </div>
