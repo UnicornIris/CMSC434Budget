@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Goals — Budget</title>
+    <title>Reports — Budget</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <div class="phone-frame">
-        <div class="app-container goals-page">
-            <header class="screen-header">
-                <h1 class="screen-title">Reports</h1>
-            </header>
+<div class="phone-frame">
+    <div class="app-container reports-page">
+        <header class="screen-header">
+            <h1 class="screen-title">Reports</h1>
+            <p class="screen-subtitle">Visualize spending patterns and review recent activity.</p>
+        </header>
 
-            <select id="chartType" class="dropdown-select">
-                <option value="bar">Bar Chart</option>
-                <option value="pie">Pie Chart</option>
-                <option value="line">Line Chart</option>
-            </select>
+        <section class="card reports-chart-card" aria-labelledby="reports-chart-heading">
+            <h2 id="reports-chart-heading" class="reports-card-title">
+                <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+                Spending overview
+            </h2>
+            <p class="reports-card-hint">Choose how to group data and which chart style to use.</p>
 
+<<<<<<< HEAD
             <select id="timeRange" class="btn-income-tool btn-income-tool-secondary">
                 <option value="monthly">Monthly</option>
                 <option value="weekly">Weekly</option>
@@ -71,3 +72,64 @@
             </a>
         </nav>
     </div>
+=======
+            <div class="reports-controls">
+                <div class="reports-field">
+                    <label class="reports-label" for="timeRange">Time range</label>
+                    <select id="timeRange" class="reports-select">
+                        <option value="monthly">Monthly</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="yearly">Yearly</option>
+                        <option value="daily">Daily</option>
+                    </select>
+                </div>
+                <div class="reports-field">
+                    <label class="reports-label" for="chartType">Chart type</label>
+                    <select id="chartType" class="reports-select">
+                        <option value="bar">Bar</option>
+                        <option value="line">Line</option>
+                        <option value="pie">Pie</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="reports-chart-wrap">
+                <canvas id="myChart" aria-label="Spending chart"></canvas>
+            </div>
+        </section>
+
+        <section class="card reports-list-card">
+            <h2 class="reports-card-title">
+                <i class="fa-solid fa-receipt" aria-hidden="true"></i>
+                Recent activity
+            </h2>
+            <p id="reports-activity-hint" class="reports-card-hint">Loading…</p>
+            <ul id="transactions-list" class="transactions-list reports-transactions-list"></ul>
+        </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0"></script>
+    <script src="reports.js"></script>
+
+    <nav class="navigationtab" aria-label="Main">
+        <a href="activity.html" class="nav-item">
+            <i class="fa-solid fa-money-bill-transfer" aria-hidden="true"></i>
+            <span class="label">Activity</span>
+        </a>
+        <a href="goals.html" class="nav-item">
+            <i class="fa-solid fa-flag-checkered" aria-hidden="true"></i>
+            <span class="label">Goals</span>
+        </a>
+        <a href="reports.html" class="nav-item active">
+            <i class="fa-solid fa-chart-column" aria-hidden="true"></i>
+            <span class="label">Reports</span>
+        </a>
+        <a href="settings.html" class="nav-item">
+            <i class="fa-solid fa-user-gear" aria-hidden="true"></i>
+            <span class="label">Settings</span>
+        </a>
+    </nav>
+</div>
+</body>
+</html>
+>>>>>>> 6bd76f2ee851a3032c14127f76a38e048eed4a4e
