@@ -1,5 +1,6 @@
 /**
- * Reports — uses same localStorage as Activity (app.js): budget-transactions, budget-income
+ * Reports — same localStorage as Activity: budget-transactions, budget-income
+ * Charts: spending, income, or both; pie “split” = totals for the range.
  */
 let myChart;
 
@@ -20,6 +21,11 @@ const REPORT_COLORS = [
     '#cfc4dc',
     '#8e7a9e'
 ];
+
+const COLOR_INCOME = '#1e7a4a';
+const COLOR_INCOME_SOFT = 'rgba(30, 122, 74, 0.88)';
+const COLOR_SPEND = '#4f3a63';
+const COLOR_SPEND_SOFT = 'rgba(79, 58, 99, 0.88)';
 
 function pad2(n) {
     return String(n).padStart(2, '0');
@@ -61,10 +67,10 @@ function loadIncomeEntries() {
     return [];
 }
 
-function aggregateMonthlyYear(expenses, year) {
+function aggregateMonthlyYearEntries(entries, year) {
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const months = Array(12).fill(0);
-    expenses.forEach(t => {
+    entries.forEach(t => {
         const d = new Date(t.date + 'T12:00:00');
         if (!Number.isNaN(d.getTime()) && d.getFullYear() === year) {
             months[d.getMonth()] += Number(t.amount) || 0;
@@ -73,7 +79,7 @@ function aggregateMonthlyYear(expenses, year) {
     return { labels: monthNames, data: months };
 }
 
-function aggregateLast7Days(expenses) {
+function aggregateLast7DaysEntries(entries) {
     const labels = [];
     const data = [];
     for (let i = 6; i >= 0; i--) {
@@ -81,14 +87,14 @@ function aggregateLast7Days(expenses) {
         d.setHours(12, 0, 0, 0);
         d.setDate(d.getDate() - i);
         const key = formatYMD(d);
-        const sum = expenses.filter(t => t.date === key).reduce((s, t) => s + (Number(t.amount) || 0), 0);
-        labels.push((d.getMonth() + 1) + '/' + d.getDate());
+        const sum = entries.filter(t => t.date === key).reduce((s, t) => s + (Number(t.amount) || 0), 0);
+        labels.push(d.getMonth() + 1 + '/' + d.getDate());
         data.push(sum);
     }
     return { labels, data };
 }
 
-function aggregateCurrentWeek(expenses) {
+function aggregateCurrentWeekEntries(entries) {
     const labels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const data = Array(7).fill(0);
     const now = new Date();
@@ -99,14 +105,14 @@ function aggregateCurrentWeek(expenses) {
         const d = new Date(start);
         d.setDate(start.getDate() + i);
         const key = formatYMD(d);
-        data[i] = expenses.filter(t => t.date === key).reduce((s, t) => s + (Number(t.amount) || 0), 0);
+        data[i] = entries.filter(t => t.date === key).reduce((s, t) => s + (Number(t.amount) || 0), 0);
     }
     return { labels, data };
 }
 
-function aggregateByYear(expenses) {
+function aggregateByYearEntries(entries) {
     const map = {};
-    expenses.forEach(t => {
+    entries.forEach(t => {
         const d = new Date(t.date + 'T12:00:00');
         if (Number.isNaN(d.getTime())) return;
         const y = d.getFullYear();
@@ -122,30 +128,52 @@ function aggregateByYear(expenses) {
     return { labels: years.map(String), data: years.map(y => map[y]) };
 }
 
-/** Build chart series from saved expenses only (spending). */
+function mergeYearlySeries(expenses, income) {
+    const e = aggregateByYearEntries(expenses);
+    const inc = aggregateByYearEntries(income);
+    const allLabels = [...new Set([...e.labels, ...inc.labels])].sort((a, b) => Number(a) - Number(b));
+    const eMap = Object.fromEntries(e.labels.map((l, i) => [l, e.data[i]]));
+    const iMap = Object.fromEntries(inc.labels.map((l, i) => [l, inc.data[i]]));
+    return {
+        labels: allLabels,
+        spending: allLabels.map(l => eMap[l] ?? 0),
+        income: allLabels.map(l => iMap[l] ?? 0)
+    };
+}
+
+/** Aligned spending + income series for the selected time range. */
 function buildChartData(range) {
     const expenses = loadExpenseTransactions();
+    const income = loadIncomeEntries();
     const y = new Date().getFullYear();
 
     if (range === 'monthly') {
-        return aggregateMonthlyYear(expenses, y);
+        const s = aggregateMonthlyYearEntries(expenses, y);
+        const inc = aggregateMonthlyYearEntries(income, y);
+        return { labels: s.labels, spending: s.data, income: inc.data };
     }
     if (range === 'weekly') {
-        return aggregateCurrentWeek(expenses);
+        const s = aggregateCurrentWeekEntries(expenses);
+        const inc = aggregateCurrentWeekEntries(income);
+        return { labels: s.labels, spending: s.data, income: inc.data };
     }
     if (range === 'yearly') {
-        return aggregateByYear(expenses);
+        return mergeYearlySeries(expenses, income);
     }
     if (range === 'daily') {
-        return aggregateLast7Days(expenses);
+        const s = aggregateLast7DaysEntries(expenses);
+        const inc = aggregateLast7DaysEntries(income);
+        return { labels: s.labels, spending: s.data, income: inc.data };
     }
-    return aggregateMonthlyYear(expenses, y);
+    const s = aggregateMonthlyYearEntries(expenses, y);
+    const inc = aggregateMonthlyYearEntries(income, y);
+    return { labels: s.labels, spending: s.data, income: inc.data };
 }
 
 function formatDisplayDate(dateStr) {
     const d = new Date(dateStr + 'T12:00:00');
     if (Number.isNaN(d.getTime())) return dateStr;
-    return (d.getMonth() + 1) + '/' + d.getDate();
+    return d.getMonth() + 1 + '/' + d.getDate();
 }
 
 function escapeHtml(text) {
@@ -223,8 +251,15 @@ function chartTickColor() {
 }
 
 function renderChart() {
-    const type = document.getElementById('chartType').value;
-    const range = document.getElementById('timeRange').value;
+    const typeSelect = document.getElementById('chartType');
+    const rangeSelect = document.getElementById('timeRange');
+    const metricSelect = document.getElementById('chartMetric');
+    if (!typeSelect || !rangeSelect) return;
+
+    const type = typeSelect.value;
+    const range = rangeSelect.value;
+    const metric = metricSelect ? metricSelect.value : 'spending';
+
     const ctx = document.getElementById('myChart');
     const selected = buildChartData(range);
     if (!ctx || !selected) return;
@@ -233,39 +268,93 @@ function renderChart() {
 
     const isPie = type === 'pie';
     const isLine = type === 'line';
-    const labelCount = selected.labels.length;
-    const bgColors = isPie
-        ? selected.labels.map((_, i) => REPORT_COLORS[i % REPORT_COLORS.length])
-        : isLine
-            ? 'rgba(79, 58, 99, 0.15)'
-            : REPORT_COLORS[0];
 
-    const borderColor = isLine ? '#4f3a63' : isPie ? '#fff' : '#4f3a63';
+    let labels = selected.labels;
+    let datasets = [];
+
+    if (isPie && metric === 'compare') {
+        const totalInc = selected.income.reduce((a, b) => a + b, 0);
+        const totalSp = selected.spending.reduce((a, b) => a + b, 0);
+        labels = ['Income (total)', 'Spending (total)'];
+        datasets = [
+            {
+                label: 'Totals for range',
+                data: [totalInc, totalSp],
+                backgroundColor: [COLOR_INCOME_SOFT, COLOR_SPEND_SOFT],
+                borderColor: ['#fff', '#fff'],
+                borderWidth: 2,
+                hoverOffset: 6
+            }
+        ];
+    } else if (isPie) {
+        const data = metric === 'income' ? selected.income : selected.spending;
+        const labelCount = labels.length;
+        const bgColors = labels.map((_, i) => REPORT_COLORS[i % REPORT_COLORS.length]);
+        datasets = [
+            {
+                label: metric === 'income' ? 'Income' : 'Spending',
+                data,
+                backgroundColor: bgColors,
+                borderColor: '#fff',
+                borderWidth: 2,
+                hoverOffset: 6
+            }
+        ];
+    } else if (metric === 'compare') {
+        datasets = [
+            {
+                label: 'Income',
+                data: selected.income,
+                backgroundColor: isLine ? 'rgba(30, 122, 74, 0.2)' : COLOR_INCOME_SOFT,
+                borderColor: COLOR_INCOME,
+                borderWidth: isLine ? 2 : 0,
+                fill: isLine,
+                tension: isLine ? 0.35 : 0
+            },
+            {
+                label: 'Spending',
+                data: selected.spending,
+                backgroundColor: isLine ? 'rgba(79, 58, 99, 0.15)' : COLOR_SPEND_SOFT,
+                borderColor: COLOR_SPEND,
+                borderWidth: isLine ? 2 : 0,
+                fill: isLine,
+                tension: isLine ? 0.35 : 0
+            }
+        ];
+    } else {
+        const data = metric === 'income' ? selected.income : selected.spending;
+        const bgColors = isLine
+            ? 'rgba(79, 58, 99, 0.15)'
+            : metric === 'income'
+              ? COLOR_INCOME_SOFT
+              : REPORT_COLORS[0];
+        const borderColor = isLine ? (metric === 'income' ? COLOR_INCOME : COLOR_SPEND) : metric === 'income' ? COLOR_INCOME : COLOR_SPEND;
+        datasets = [
+            {
+                label: metric === 'income' ? 'Income' : 'Spending',
+                data,
+                backgroundColor: bgColors,
+                borderColor: isLine ? borderColor : borderColor,
+                borderWidth: isLine ? 2 : 0,
+                fill: isLine,
+                tension: isLine ? 0.35 : 0
+            }
+        ];
+    }
+
+    const labelCount = labels.length;
+    const legendDisplay = isPie ? true : datasets.length > 1 || metric !== 'spending';
 
     myChart = new Chart(ctx, {
         type,
-        data: {
-            labels: selected.labels,
-            datasets: [
-                {
-                    label: 'Spending',
-                    data: selected.data,
-                    backgroundColor: bgColors,
-                    borderColor: isPie ? '#fff' : borderColor,
-                    borderWidth: isPie ? 2 : isLine ? 2 : 0,
-                    fill: isLine,
-                    tension: isLine ? 0.35 : 0,
-                    hoverOffset: isPie ? 6 : 0
-                }
-            ]
-        },
+        data: { labels, datasets },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
                 legend: {
-                    display: isPie,
+                    display: legendDisplay,
                     position: 'bottom',
                     labels: {
                         boxWidth: 10,
@@ -283,7 +372,17 @@ function renderChart() {
                     callbacks: {
                         label(ctx) {
                             const v = ctx.raw;
-                            return typeof v === 'number' ? ` $${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : ` ${v}`;
+                            const prefix = ctx.dataset.label ? ctx.dataset.label + ': ' : '';
+                            return (
+                                prefix +
+                                (typeof v === 'number'
+                                    ? '$' +
+                                      v.toLocaleString(undefined, {
+                                          minimumFractionDigits: 2,
+                                          maximumFractionDigits: 2
+                                      })
+                                    : String(v))
+                            );
                         }
                     }
                 }
@@ -324,11 +423,15 @@ function refreshReports() {
     renderTransactions();
 }
 
-document.getElementById('chartType').addEventListener('change', refreshReports);
-document.getElementById('timeRange').addEventListener('change', refreshReports);
+const tr = document.getElementById('timeRange');
+const ct = document.getElementById('chartType');
+const cm = document.getElementById('chartMetric');
+if (tr) tr.addEventListener('change', refreshReports);
+if (ct) ct.addEventListener('change', refreshReports);
+if (cm) cm.addEventListener('change', refreshReports);
 
 window.addEventListener('load', refreshReports);
-window.addEventListener('pageshow', (e) => {
+window.addEventListener('pageshow', e => {
     if (e.persisted) refreshReports();
 });
 

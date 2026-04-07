@@ -16,10 +16,10 @@
 
         <section class="card reports-chart-card" aria-labelledby="reports-chart-heading">
             <h2 id="reports-chart-heading" class="reports-card-title">
-                <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
-                Spending overview
+                <i class="fa-solid fa-chart-column" aria-hidden="true"></i>
+                Income &amp; spending
             </h2>
-            <p class="reports-card-hint">Choose how to group data and which chart style to use.</p>
+            <p class="reports-card-hint">Spending only, income only, or compare both. Pie + “Compare” shows total income vs total spending for the selected range.</p>
 
             <div class="reports-controls">
                 <div class="reports-field">
@@ -39,10 +39,18 @@
                         <option value="pie">Pie</option>
                     </select>
                 </div>
+                <div class="reports-field reports-field-full">
+                    <label class="reports-label" for="chartMetric">Show</label>
+                    <select id="chartMetric" class="reports-select">
+                        <option value="spending">Spending</option>
+                        <option value="income">Income</option>
+                        <option value="compare">Income &amp; spending</option>
+                    </select>
+                </div>
             </div>
 
             <div class="reports-chart-wrap">
-                <canvas id="myChart" aria-label="Spending chart"></canvas>
+                <canvas id="myChart" aria-label="Income and spending chart"></canvas>
             </div>
         </section>
 

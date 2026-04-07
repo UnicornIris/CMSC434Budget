@@ -808,6 +808,10 @@ body {
     padding-bottom: calc(var(--nav-h) + 12px + env(safe-area-inset-bottom, 0px));
 }
 
+.reports-field-full {
+    grid-column: 1 / -1;
+}
+
 .reports-chart-card {
     margin-bottom: 12px;
 }
@@ -908,5 +912,9 @@ body {
 @media (max-width: 360px) {
     .reports-controls {
         grid-template-columns: 1fr;
+    }
+
+    .reports-field-full {
+        grid-column: 1;
     }
 }
