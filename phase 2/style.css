@@ -804,6 +804,33 @@ body {
     transition: width 0.3s ease;
 }
 
+.dropdown-select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 2px solid var(--btn-primary-bg);
+    background: var(--btn-primary-bg);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.dropdown-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='white'%3E%3Cpath d='M5 7l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+    margin-bottom: 10px;
+}
+
 .goals-page {
     height: 100%;
     overflow-y: auto;
