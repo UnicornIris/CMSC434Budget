@@ -87,13 +87,8 @@ function formatDateForStorage(d) {
 }
 
 function formatCurrency(amt) {
-    // 1. Check localStorage for the user's preference
     const currency = localStorage.getItem("userCurrency") || "USD";
-    
-    // 2. Choose the correct symbol
     const symbol = (currency === "EUR") ? "€" : "$";
-    
-    // 3. Return the formatted string
     return symbol + Number(amt).toFixed(2);
 }
 
@@ -153,6 +148,13 @@ function getFilteredIncomeEntries() {
         .sort((a, b) => new Date(b.date) - new Date(a.date));
 }
 
+function getFilteredExpenseEntries() {
+    const { start, end } = getDateRangeForPeriod(selectedPeriod);
+    return transactions
+        .filter(t => isDateInRange(t.date, start, end))
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+}
+
 function formatShortDateDisplay(dateStr) {
     const d = new Date(dateStr + 'T12:00:00');
     if (Number.isNaN(d.getTime())) return dateStr;
@@ -197,10 +199,27 @@ const btnOpenIncomeList = document.getElementById('btn-open-income-list');
 const incomeSaveBtn = document.getElementById('income-save-btn');
 const incomeCancelBtn = document.getElementById('income-cancel-btn');
 
+const expenseEntriesView = document.getElementById('expense-entries-view');
+const expenseEntriesList = document.getElementById('expense-entries-list');
+const expenseListBackBtn = document.getElementById('expense-list-back-btn');
+const expenseListAddBtn = document.getElementById('expense-list-add-btn');
+const expenseListPeriodLabel = document.getElementById('expense-list-period-label');
+const expenseModal = document.getElementById('expense-modal');
+const btnOpenExpenseModal = document.getElementById('btn-open-expense-modal');
+const btnOpenExpenseList = document.getElementById('btn-open-expense-list');
+const expenseSaveBtn = document.getElementById('expense-save-btn');
+const expenseCancelBtn = document.getElementById('expense-cancel-btn');
+
 function populateIncomeSourceSelect() {
     const sel = document.getElementById('income-source');
     if (!sel) return;
     sel.innerHTML = INCOME_SOURCES.map(s => `<option value="${s}">${s}</option>`).join('');
+}
+
+function populateExpenseCategorySelect() {
+    const sel = document.getElementById('expense-category');
+    if (!sel) return;
+    sel.innerHTML = CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('');
 }
 
 function getTodayTransactions() {
@@ -480,6 +499,143 @@ function hideIncomeEntriesView() {
     if (incomeEntriesView) incomeEntriesView.classList.add('hidden');
 }
 
+function openExpenseModal(existingId) {
+    if (!expenseModal) return;
+    editingTransactionId = existingId || null;
+    const titleEl = document.getElementById('expense-modal-title');
+    const nameEl = document.getElementById('expense-name');
+    const amountEl = document.getElementById('expense-amount');
+    const dateEl = document.getElementById('expense-date');
+    const categoryEl = document.getElementById('expense-category');
+    
+    if (existingId) {
+        const e = transactions.find(x => x.id === existingId);
+        if (!e) return;
+        if (titleEl) titleEl.textContent = 'Edit expense';
+        if (nameEl) nameEl.value = e.name;
+        if (amountEl) amountEl.value = String(e.amount);
+        if (dateEl) dateEl.value = e.date;
+        if (categoryEl) categoryEl.value = CATEGORIES.includes(e.category) ? e.category : 'Other';
+    } else {
+        if (titleEl) titleEl.textContent = 'Add expense';
+        if (nameEl) nameEl.value = '';
+        if (amountEl) amountEl.value = '';
+        if (dateEl) dateEl.value = formatDateForStorage(new Date());
+        if (categoryEl) categoryEl.value = 'Other';
+    }
+    expenseModal.classList.remove('hidden');
+}
+
+function closeExpenseModal() {
+    editingTransactionId = null;
+    if (expenseModal) expenseModal.classList.add('hidden');
+}
+
+function saveExpenseFromModal() {
+    const nameEl = document.getElementById('expense-name');
+    const amountEl = document.getElementById('expense-amount');
+    const dateEl = document.getElementById('expense-date');
+    const categoryEl = document.getElementById('expense-category');
+    
+    const name = (nameEl && nameEl.value.trim()) || 'Expense';
+    const amount = Math.max(0, parseFloat(amountEl && amountEl.value) || 0);
+    const dateStr = (dateEl && dateEl.value) || formatDateForStorage(new Date());
+    const category = (categoryEl && categoryEl.value) || 'Other';
+    
+    if (amount <= 0) {
+        alert('Please enter a positive amount.');
+        return;
+    }
+    
+    if (editingTransactionId) {
+        const e = transactions.find(x => x.id === editingTransactionId);
+        if (e) {
+            e.name = name;
+            e.amount = amount;
+            e.date = dateStr;
+            e.category = category;
+        }
+    } else {
+        transactions.push({
+            id: generateId(),
+            name,
+            amount,
+            date: dateStr,
+            category
+        });
+    }
+    
+    saveTransactions(transactions);
+    closeExpenseModal();
+    updateSpentTodayDisplay();
+    updateProgressSummary();
+    renderExpenseEntriesList();
+    renderTodayTransactionsList();
+}
+
+function deleteExpenseEntry(id) {
+    transactions = transactions.filter(t => t.id !== id);
+    saveTransactions(transactions);
+    updateSpentTodayDisplay();
+    updateProgressSummary();
+    renderExpenseEntriesList();
+    renderTodayTransactionsList();
+}
+
+function renderExpenseEntriesList() {
+    if (!expenseEntriesList) return;
+    const rows = getFilteredExpenseEntries();
+    expenseEntriesList.innerHTML = '';
+    
+    if (rows.length === 0) {
+        expenseEntriesList.innerHTML = '<li class="transaction-item transaction-empty">No expense entries in this period.</li>';
+        return;
+    }
+    
+    rows.forEach(e => {
+        const li = document.createElement('li');
+        li.className = 'transaction-item';
+        li.dataset.id = e.id;
+        li.innerHTML = `
+            <div class="transaction-info">
+                <span class="transaction-name">${escapeHtml(e.name)}</span>
+                <span class="income-entry-meta">${escapeHtml(e.category)} · ${formatShortDateDisplay(e.date)}</span>
+            </div>
+            <span class="transaction-amount">-${formatCurrency(e.amount)}</span>
+            <div class="transaction-actions">
+                <button type="button" class="btn-edit" data-expense-action="edit" data-id="${escapeHtml(e.id)}">Edit</button>
+                <button type="button" class="btn-delete" data-expense-action="delete" data-id="${escapeHtml(e.id)}">Delete</button>
+            </div>
+        `;
+        expenseEntriesList.appendChild(li);
+    });
+    
+    expenseEntriesList.querySelectorAll('[data-expense-action="edit"]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openExpenseModal(btn.dataset.id);
+        });
+    });
+    expenseEntriesList.querySelectorAll('[data-expense-action="delete"]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteExpenseEntry(btn.dataset.id);
+        });
+    });
+}
+
+function showExpenseEntriesView() {
+    if (expenseListPeriodLabel) {
+        expenseListPeriodLabel.textContent = 'Showing: ' + formatPeriodLabel(selectedPeriod);
+    }
+    renderExpenseEntriesList();
+    if (expenseEntriesView) expenseEntriesView.classList.remove('hidden');
+}
+
+function hideExpenseEntriesView() {
+    if (expenseEntriesView) expenseEntriesView.classList.add('hidden');
+}
+
 if (spentTodayCard) {
     spentTodayCard.addEventListener('click', showTodayTransactionsView);
     spentTodayCard.addEventListener('keydown', (e) => {
@@ -489,6 +645,7 @@ if (spentTodayCard) {
         }
     });
 }
+
 if (backBtn) backBtn.addEventListener('click', hideTodayTransactionsView);
 if (editSaveBtn) editSaveBtn.addEventListener('click', saveEditedTransaction);
 if (editCancelBtn) editCancelBtn.addEventListener('click', closeEditModal);
@@ -499,6 +656,13 @@ if (incomeListBackBtn) incomeListBackBtn.addEventListener('click', hideIncomeEnt
 if (incomeListAddBtn) incomeListAddBtn.addEventListener('click', () => openIncomeModal(null));
 if (incomeSaveBtn) incomeSaveBtn.addEventListener('click', saveIncomeFromModal);
 if (incomeCancelBtn) incomeCancelBtn.addEventListener('click', closeIncomeModal);
+
+if (btnOpenExpenseModal) btnOpenExpenseModal.addEventListener('click', () => openExpenseModal(null));
+if (btnOpenExpenseList) btnOpenExpenseList.addEventListener('click', showExpenseEntriesView);
+if (expenseListBackBtn) expenseListBackBtn.addEventListener('click', hideExpenseEntriesView);
+if (expenseListAddBtn) expenseListAddBtn.addEventListener('click', () => openExpenseModal(null));
+if (expenseSaveBtn) expenseSaveBtn.addEventListener('click', saveExpenseFromModal);
+if (expenseCancelBtn) expenseCancelBtn.addEventListener('click', closeExpenseModal);
 
 function openPeriodModal() {
     if (periodModal) periodModal.classList.remove('hidden');
@@ -514,11 +678,19 @@ function selectPeriod(period) {
     if (periodLabel) periodLabel.textContent = formatPeriodLabel(period);
     updateProgressSummary();
     closePeriodModal();
+    
     if (incomeEntriesView && !incomeEntriesView.classList.contains('hidden')) {
         if (incomeListPeriodLabel) {
             incomeListPeriodLabel.textContent = 'Showing: ' + formatPeriodLabel(selectedPeriod);
         }
         renderIncomeEntriesList();
+    }
+    
+    if (expenseEntriesView && !expenseEntriesView.classList.contains('hidden')) {
+        if (expenseListPeriodLabel) {
+            expenseListPeriodLabel.textContent = 'Showing: ' + formatPeriodLabel(selectedPeriod);
+        }
+        renderExpenseEntriesList();
     }
 }
 
@@ -541,18 +713,18 @@ if (periodModal) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. CLEAR EVERYTHING ON STARTUP
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(STORAGE_KEY_INCOME);
     transactions = [];
     incomeEntries = [];
 
-    // 3. RUN THE REST OF THE SETUP
     populateIncomeSourceSelect();
+    populateExpenseCategorySelect(); 
     updateSpentTodayDisplay();
     updateProgressSummary(); 
     if (periodLabel) periodLabel.textContent = formatPeriodLabel(selectedPeriod);
 });
+
 function getCurrencySymbol() {
     const currency = localStorage.getItem("userCurrency") || "USD";
     return currency === "EUR" ? "€" : "$";
